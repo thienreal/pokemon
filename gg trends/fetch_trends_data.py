@@ -30,15 +30,17 @@ RAW_DIR = 'dest_trends_raw'
 
 class TrendsDataFetcher:
     def __init__(self, source_csv: str = DEFAULT_SOURCE, timeframe: str = DEFAULT_TIMEFRAME, 
-                 anchor_keyword: str = "Thành phố Hà Nội"):
+                 anchor_keyword: str = "Rau má"):
         """timeframe có thể là preset (today 12-m, today 5-y) hoặc 'YYYY-MM-DD YYYY-MM-DD'"""
         self.source_csv = source_csv
         self.timeframe = timeframe
         self.anchor_keyword = anchor_keyword
-        self.pytrends = TrendReq(hl='vi', tz=420, timeout=(10, 25))
+        # Tạo session với timeout dài hơn (không dùng retries vì urllib3 incompatible)
+        self.pytrends = TrendReq(hl='vi', tz=420, timeout=(10, 30))
         os.makedirs(RAW_DIR, exist_ok=True)
         self.destinations: List[str] = []
         self.anchor_values: Dict[str, float] = {}  # Cache anchor values by date
+        self.request_count = 0  # Đếm số requests đã gửi
 
     def sanitize_keyword(self, kw: str) -> str:
         """Sanitize nhẹ nhàng hơn để giữ lại tên tỉnh/thành phố phân biệt duplicates"""
@@ -105,18 +107,35 @@ class TrendsDataFetcher:
         
         logging.info(f"[Group {idx}] FETCH {len(group)} items -> {', '.join(group[:3])}...")
         
+        # Tạo session mới mỗi 10 requests để reset cookies
+        if self.request_count > 0 and self.request_count % 10 == 0:
+            logging.info(f"  🔄 Recreating session (request #{self.request_count})...")
+            self.pytrends = TrendReq(hl='vi', tz=420, timeout=(10, 30))
+            time.sleep(random.uniform(3, 5))
+        
         max_retries = 3
         attempt = 0
         
         while attempt < max_retries:
             attempt += 1
             try:
+                # Random delay trước khi fetch để tránh pattern detection
+                if attempt > 1:
+                    jitter = random.uniform(1.0, 3.0)
+                    wait_time = retry_delay + jitter
+                    logging.info(f"  ⏳ Waiting {wait_time:.1f}s before retry {attempt}/{max_retries}...")
+                    time.sleep(wait_time)
+                
+                # Thêm delay nhỏ trước mỗi request
+                time.sleep(random.uniform(1, 2))
+                
                 self.pytrends.build_payload(group, cat=0, timeframe=self.timeframe, geo='VN', gprop='')
+                self.request_count += 1
                 df = self.pytrends.interest_over_time()
                 
                 if df.empty:
                     logging.warning(f"  ⚠️ Empty (attempt {attempt})")
-                    time.sleep(2)
+                    time.sleep(3)
                     continue
                 
                 if 'isPartial' in df.columns:
@@ -131,14 +150,31 @@ class TrendsDataFetcher:
                         self.anchor_values[date_key] = row[self.anchor_keyword]
                 
                 df.to_csv(path, index=False, encoding='utf-8-sig')
-                logging.info(f"  💾 Saved {path} ({len(df)} rows)")
+                logging.info(f"  ✅ Saved {path} ({len(df)} rows, total requests: {self.request_count})")
                 return df
                 
             except Exception as e:
                 msg = str(e)
-                if '429' in msg and attempt < max_retries:
-                    logging.warning(f"  ⏳ 429, retry {attempt}/{max_retries}, sleep {retry_delay}s")
-                    time.sleep(retry_delay)
+                if '429' in msg or 'Too Many Requests' in msg:
+                    backoff = retry_delay * (2 ** (attempt - 1))  # Exponential backoff
+                    logging.warning(f"  🚫 429 Too Many Requests (attempt {attempt}/{max_retries})")
+                    
+                    if attempt >= max_retries:
+                        logging.error(f"  ❌ Max retries reached. Recreating session and waiting longer...")
+                        # Tạo session mới và chờ lâu hơn
+                        self.pytrends = TrendReq(hl='vi', tz=420, timeout=(10, 30))
+                        extra_wait = random.uniform(30, 45)
+                        logging.warning(f"  ⏳ Cooling down: waiting {extra_wait:.1f}s...")
+                        time.sleep(extra_wait)
+                        break
+                    
+                    logging.warning(f"  ⏳ Exponential backoff: waiting {backoff:.1f}s...")
+                    time.sleep(backoff)
+                    
+                    # Tạo session mới sau mỗi lần gặp 429
+                    logging.info(f"  🔄 Recreating session after 429...")
+                    self.pytrends = TrendReq(hl='vi', tz=420, timeout=(10, 30))
+                    continue
                 else:
                     logging.error(f"  ❌ Error: {e}")
                     break
@@ -173,22 +209,31 @@ class TrendsDataFetcher:
         success_count = 0
         failed_groups = []
         
-        for i, g in enumerate(groups, start=1):
+        # Thêm initial delay để đảm bảo không bị rate limit từ đầu
+        if start_group == 0:
+            initial_wait = random.uniform(3, 5)
+            logging.info(f"Initial cooldown: waiting {initial_wait:.1f}s before starting...")
+            time.sleep(initial_wait)
+        
+        for i, group in enumerate(groups, 1):
             actual_group_num = group_offset + i
-            df = self.fetch_group(g, actual_group_num, retry_delay=retry_delay, resume=resume, use_anchor=use_anchor)
+            df = self.fetch_group(group, actual_group_num, retry_delay=retry_delay, resume=resume, use_anchor=use_anchor)
             
             if df is not None and not df.empty:
                 success_count += 1
             else:
-                keywords_in_group = [k for k in g if k != self.anchor_keyword]
+                keywords_in_group = [k for k in group if k != self.anchor_keyword]
                 failed_groups.append({
                     'group_num': actual_group_num,
                     'keywords': keywords_in_group
                 })
             
             if i < len(groups):
-                logging.info(f"  ⏲️ Wait {group_delay}s...")
-                time.sleep(group_delay)
+                # Random jitter để tránh pattern detection
+                jitter = random.uniform(0, min(2.0, group_delay * 0.5))
+                total_wait = group_delay + jitter
+                logging.info(f"  ⏲️ Wait {total_wait:.1f}s...")
+                time.sleep(total_wait)
         
         # Summary
         total_groups = len(groups)
@@ -231,8 +276,8 @@ def main():
     parser.add_argument('--start-date', help='Custom start YYYY-MM-DD')
     parser.add_argument('--end-date', help='Custom end YYYY-MM-DD')
     parser.add_argument('--batch-size', type=int, default=5, help='Keywords per request (will be 4 with anchor)')
-    parser.add_argument('--group-delay', type=float, default=4.0, help='Seconds between groups (e.g., 1, 0.5, 4)')
-    parser.add_argument('--retry-delay', type=float, default=6.0, help='Seconds to wait when retrying after 429 error (e.g., 1, 0.5, 6)')
+    parser.add_argument('--group-delay', type=float, default=10.0, help='Seconds between groups (default: 10, khuyên dùng >= 10 để tránh 429)')
+    parser.add_argument('--retry-delay', type=float, default=15.0, help='Initial delay khi retry sau 429 (default: 15, sẽ tăng exponential)')
     parser.add_argument('--anchor', default='Rau má', help='Anchor keyword for normalization (bất kỳ từ khóa phổ biến nào)')
     parser.add_argument('--no-anchor', action='store_true', help='Disable anchor normalization')
     parser.add_argument('--no-resume', action='store_true', help='Force refetch')

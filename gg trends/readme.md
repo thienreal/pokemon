@@ -9,10 +9,14 @@ keyword_normalizer.py -> keyword_mapping.csv
 fetch_trends_data.py -> gg trends/dest_trends_raw/*.csv
     # Fetch tất cả với anchor normalization (4 keywords + 1 anchor/group)
     # Anchor có thể là BẤT KỲ từ khóa phổ biến nào, không cần có trong destinations
-    python fetch_trends_data.py --keywords-file keyword_mapping.csv --start-date 2004-01-01 --end-date 2025-11-30 --group-delay 1 --anchor "Rau má"
+    # QUAN TRỌNG: Dùng group-delay >= 10s để tránh bị 429 (Too Many Requests)
+    python fetch_trends_data.py --keywords-file keyword_mapping.csv --start-date 2004-01-01 --end-date 2025-11-30 --anchor "Rau má"
+    
+    # Nếu vẫn bị 429, tăng delay:
+    python fetch_trends_data.py --keywords-file keyword_mapping.csv --start-date 2004-01-01 --end-date 2025-11-30 --anchor "Rau má" --group-delay 15 --retry-delay 20
     
     # Nếu có groups fail, retry specific groups:
-    python fetch_trends_data.py --keywords-file keyword_mapping.csv --start-date 2004-01-01 --end-date 2025-11-30 --group-delay 1 --anchor "Rau má" --start-group 10 --end-group 15
+    python fetch_trends_data.py --keywords-file keyword_mapping.csv --start-date 2004-01-01 --end-date 2025-11-30 --anchor "Rau má" --start-group 10 --end-group 15
     
     # Failed groups sẽ được lưu vào: dest_trends_raw/failed_groups.txt
 
