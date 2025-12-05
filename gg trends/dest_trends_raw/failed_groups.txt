@@ -1,0 +1,16 @@
+Total batches: 242
+Success: 231
+Failed: 11
+
+Failed group IDs:
+2
+10
+13
+56
+66
+70
+96
+112
+221
+241
+242
