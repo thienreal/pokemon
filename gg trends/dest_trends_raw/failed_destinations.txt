@@ -1,0 +1,7 @@
+Destinations không lấy được dữ liệu từ Google Trends (hệ số = 0):
+
+Group 2: Văn hóa, Thể thao các dân tộc vùng Đông Bắc
+Group 112: Vàm Sát
+Group 221: Bảo tàng Văn hoá các Dân tộc Việt Nam
+
+Tất cả các group khác (236/242) đã fetch dữ liệu thành công.
