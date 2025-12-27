@@ -107,7 +107,7 @@ def convert_lunar_range_to_gregorian_month(lunar_range, year):
     return convert_lunar_to_gregorian_month((start_month, start_day), year)
 
 # Read the CSV file
-df = pd.read_csv('/workspaces/pokemon/data/festival_with_years_2018_2024.csv')
+df = pd.read_csv('/workspaces/pokemon/data/vietnam_festivals_with_years_2018_2024.csv')
 
 # Drop the old detailed date columns, keep only the main columns we need
 cols_to_keep = [col for col in df.columns if col not in 
@@ -143,7 +143,7 @@ for idx, row in df.iterrows():
             print(f"Warning: Could not parse '{time_lunar}' in row {idx}")
 
 # Save the modified CSV
-df.to_csv('/workspaces/pokemon/data/festival.csv', index=False)
+df.to_csv('/workspaces/pokemon/data/vietnam_festivals.csv', index=False)
 print("Conversion completed! File updated with month-only format (YYYY-MM)")
 print(f"\nTotal rows processed: {len(df)}")
 print("\nVí dụ:")

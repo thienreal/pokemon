@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read mapping
-mapping = pd.read_csv('/workspaces/pokemon/data/mapping.csv')
+mapping = pd.read_csv('/workspaces/pokemon/data/vietnam_province_name_mapping.csv')
 province_mapping = dict(zip(mapping['old'], mapping['new']))
 
 print("Province Mapping:")
@@ -11,11 +11,11 @@ print(f"  ... ({len(province_mapping)} mappings)")
 
 # List of files to update
 files = [
-    'accommodation_vietnam.csv',
-    'entertainment_vietnam.csv',
-    'healthcare_vietnam.csv',
-    'restaurant_vietnam.csv',
-    'shop_vietnam.csv'
+    'vietnam_accommodation.csv',
+    'vietnam_entertainment.csv',
+    'vietnam_healthcare.csv',
+    'vietnam_restaurants.csv',
+    'vietnam_shops.csv'
 ]
 
 results = {}

@@ -77,7 +77,7 @@ def convert_lunar_range_to_gregorian(lunar_range, year):
     return start_date, end_date
 
 # Read the CSV file
-df = pd.read_csv('/workspaces/pokemon/data/festival.csv')
+df = pd.read_csv('/workspaces/pokemon/data/vietnam_festivals.csv')
 
 # Add new columns for years 2018-2024
 years = list(range(2018, 2025))
@@ -105,8 +105,8 @@ for idx, row in df.iterrows():
         print(f"Warning: Could not parse '{time_lunar}' in row {idx}")
 
 # Save the modified CSV
-df.to_csv('/workspaces/pokemon/data/festival_with_years_2018_2024.csv', index=False)
-print("Conversion completed! File saved to festival_with_years_2018_2024.csv")
+df.to_csv('/workspaces/pokemon/data/vietnam_festivals_with_years_2018_2024.csv', index=False)
+print("Conversion completed! File saved to vietnam_festivals_with_years_2018_2024.csv")
 print(f"\nTotal rows processed: {len(df)}")
 print("\nFirst few rows with new columns:")
 print(df.iloc[0:3, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]].to_string())

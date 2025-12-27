@@ -3,13 +3,13 @@ import os
 
 # Đường dẫn files
 data_dir = "/workspaces/pokemon/data"
-mapping_file = os.path.join(data_dir, "mapping.csv")
+mapping_file = os.path.join(data_dir, "vietnam_province_name_mapping.csv")
 
 # File cần mapping
 files_to_map = {
-    "youtube_province_videos.csv": "province",
-    "complete_destinations_normalized.csv": None,  # Xử lý đặc biệt vì cột tên là header
-    "cacKhuVucVietNam_with_distances.csv": "province"
+    "vietnam_youtube_province_videos.csv": "province",
+    "vietnam_destinations_normalized.csv": None,  # Xử lý đặc biệt vì cột tên là header
+    "vietnam_regions_with_distances.csv": "province"
 }
 
 # Load mapping
@@ -20,9 +20,9 @@ print("Mapping Dictionary:")
 print(mapping_dict)
 print("\n" + "="*80 + "\n")
 
-# 1. Map youtube_province_videos.csv
-print("Processing: youtube_province_videos.csv")
-youtube_file = os.path.join(data_dir, "youtube_province_videos.csv")
+# 1. Map vietnam_youtube_province_videos.csv
+print("Processing: vietnam_youtube_province_videos.csv")
+youtube_file = os.path.join(data_dir, "vietnam_youtube_province_videos.csv")
 youtube_df = pd.read_csv(youtube_file)
 print(f"Original shape: {youtube_df.shape}")
 print(f"Unique provinces before: {youtube_df['province'].nunique()}")
@@ -34,11 +34,11 @@ print(f"Provinces: {sorted(youtube_df['province'].unique())}")
 
 # Save
 youtube_df.to_csv(youtube_file, index=False)
-print("✓ youtube_province_videos.csv saved\n" + "="*80 + "\n")
+print("✓ vietnam_youtube_province_videos.csv saved\n" + "="*80 + "\n")
 
-# 2. Map cacKhuVucVietNam_with_distances.csv
-print("Processing: cacKhuVucVietNam_with_distances.csv")
-region_file = os.path.join(data_dir, "cacKhuVucVietNam_with_distances.csv")
+# 2. Map vietnam_regions_with_distances.csv
+print("Processing: vietnam_regions_with_distances.csv")
+region_file = os.path.join(data_dir, "vietnam_regions_with_distances.csv")
 region_df = pd.read_csv(region_file)
 print(f"Original shape: {region_df.shape}")
 print(f"Unique provinces before: {region_df['province'].nunique()}")
@@ -50,12 +50,12 @@ print(f"Provinces: {sorted(region_df['province'].unique())}")
 
 # Save
 region_df.to_csv(region_file, index=False)
-print("✓ cacKhuVucVietNam_with_distances.csv saved\n" + "="*80 + "\n")
+print("✓ vietnam_regions_with_distances.csv saved\n" + "="*80 + "\n")
 
-# 3. Map complete_destinations_normalized.csv
+# 3. Map vietnam_destinations_normalized.csv
 # File này khác vì tên tỉnh nằm ở cột header (column names)
-print("Processing: complete_destinations_normalized.csv")
-dest_file = os.path.join(data_dir, "complete_destinations_normalized.csv")
+print("Processing: vietnam_destinations_normalized.csv")
+dest_file = os.path.join(data_dir, "vietnam_destinations_normalized.csv")
 dest_df = pd.read_csv(dest_file)
 print(f"Original shape: {dest_df.shape}")
 print(f"Original columns (first 10): {list(dest_df.columns[:10])}")
@@ -74,11 +74,11 @@ for col in dest_df.columns:
 
 # Vì complete_destinations_normalized.csv chứa tên địa điểm cụ thể, không phải tên tỉnh
 # Chúng ta sẽ giữ nguyên các cột này, chỉ cần đảm bảo dữ liệu được xử lý đúng
-print("✓ complete_destinations_normalized.csv - No direct mapping needed (contains specific destination names, not province names)")
+print("✓ vietnam_destinations_normalized.csv - No direct mapping needed (contains specific destination names, not province names)")
 print("\n" + "="*80 + "\n")
 
 print("✓ All files have been processed and mapped successfully!")
 print("\nSummary:")
-print(f"- youtube_province_videos.csv: {youtube_df['province'].nunique()} provinces")
-print(f"- cacKhuVucVietNam_with_distances.csv: {region_df['province'].nunique()} provinces")
-print(f"- complete_destinations_normalized.csv: Destination names (no direct mapping)")
+print(f"- vietnam_youtube_province_videos.csv: {youtube_df['province'].nunique()} provinces")
+print(f"- vietnam_regions_with_distances.csv: {region_df['province'].nunique()} provinces")
+print(f"- vietnam_destinations_normalized.csv: Destination names (no direct mapping)")

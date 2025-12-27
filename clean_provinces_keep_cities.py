@@ -2,7 +2,7 @@ import pandas as pd
 import re
 
 # Read mapping.csv to get valid provinces
-mapping = pd.read_csv('/workspaces/pokemon/data/mapping.csv')
+mapping = pd.read_csv('/workspaces/pokemon/data/vietnam_province_name_mapping.csv')
 valid_provinces = set(mapping['old'].unique())
 
 # Create a mapping for "Thành phố" variations to standardized names
@@ -28,11 +28,11 @@ print(f"Total valid provinces: {len(valid_provinces)}")
 
 # List of files to clean
 files = [
-    'accommodation_vietnam.csv',
-    'entertainment_vietnam.csv', 
-    'healthcare_vietnam.csv',
-    'restaurant_vietnam.csv',
-    'shop_vietnam.csv'
+    'vietnam_accommodation.csv',
+    'vietnam_entertainment.csv', 
+    'vietnam_healthcare.csv',
+    'vietnam_restaurants.csv',
+    'vietnam_shops.csv'
 ]
 
 results = {}
