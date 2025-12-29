@@ -1,0 +1,25 @@
+﻿file,total,mapped,unmapped,unique,has_province_column
+destinations_statistics.csv,968,968,0,N/A (no province column),False
+keyword_mapping_normalized.csv,967,967,0,34,True
+vietnam_accommodation.csv,11795,11795,0,33,True
+vietnam_area_population.csv,483,483,0,34,True
+vietnam_destinations_normalized.csv,180,180,0,N/A (no province column),False
+vietnam_entertainment.csv,339,339,0,29,True
+vietnam_festivals.csv,142,139,3,31,True
+vietnam_grdp_by_province.csv,441,441,0,34,True
+vietnam_healthcare.csv,329,329,0,28,True
+vietnam_population.csv,69,69,0,34,True
+vietnam_regions_with_distances.csv,34,34,0,34,True
+vietnam_restaurants.csv,2151,2151,0,33,True
+vietnam_seasonal_destinations_strong.csv,117,117,0,N/A (no province column),False
+vietnam_shops.csv,597,597,0,33,True
+vietnam_weather_tourism_2018.csv,259880,259880,0,31,True
+vietnam_weather_tourism_2019.csv,259880,259880,0,31,True
+vietnam_weather_tourism_2020.csv,260592,260592,0,31,True
+vietnam_weather_tourism_2021.csv,259880,259880,0,31,True
+vietnam_weather_tourism_2022.csv,259880,259880,0,31,True
+vietnam_weather_tourism_2023.csv,259880,259880,0,31,True
+vietnam_weather_tourism_2024.csv,260592,260592,0,31,True
+vietnam_weather_tourism_2025.csv,249200,249200,0,31,True
+vietnam_youtube_province_aggregates.csv,36,36,0,34,True
+vietnam_youtube_province_videos.csv,2999,2999,0,34,True
