@@ -1,0 +1,43 @@
+15-minute Presentation Script (hold-in-hand, continuous prose)
+Topic: Forecasting Vietnam Tourism Search Traffic with Machine Learning
+Timing: ~15 minutes, speaking pace ~130–150 words/min
+
+Hello everyone, I’m pleased to share a data story about Vietnam’s tourism. We’ll walk through why we did this, where the data comes from, how we processed it, the machine learning model, the results, the key insights, and the practical recommendations for short-term tourism planning. The goal is to see how tourism demand is reflected in search traffic, how it is shaped by seasonality, weather, and economics, and how short-term forecasting can drive faster, more precise decisions.
+
+Our objectives are fourfold. First, analyze tourism search trends from 2011 to 2025. Second, build a short-term forecasting model for each destination. Third, identify promising, fast-growing destinations. Fourth, quantify how weather affects tourism demand. The entire pipeline is a journey from raw data to action-oriented recommendations.
+
+On data: Google Trends covers 968 destinations across 180 months; weather data spans 34 provinces with 5,916 records; geography covers distance to Hanoi and Ho Chi Minh City; economics includes GRDP, population, and density; social media adds YouTube signals; and we capture seasonality and peaks. The merged dataset holds 278,436 rows and over 40 features, covering 34 provinces and 968 destinations from 01/2011 to 12/2025—enough for both trend analysis and model training.
+
+Processing pipeline: collect, clean, standardize province names for accurate joins; engineer features—especially extended weather features; merge all sources; split by time; train LightGBM; then forecast and analyze. Key safeguard: standardizing province names to avoid mismatched GRDP or weather, and enriching with weather features to capture climate effects.
+
+Extended weather features: convert daily to monthly—min and max temperature, temperature amplitude, temperature standard deviation, total rainfall, maximum daily rainfall, and rainy days. A core insight: high temperature amplitude dampens travel intent; stable weather encourages demand. Heavy rainfall also suppresses demand.
+
+Feature set: lags at 1, 2, 3, 6, 12 months; rolling means and standard deviations at 3, 6, 12 months; seasonal encoding of month/year/quarter via sine and cosine; weather features; geography (distance to Hanoi/HCMC, latitude, longitude); economics and population. In total, 41 features so the model sees history, short-term momentum, seasonality, weather, geography, and economics.
+
+Model: LightGBM with 139 trees, learning rate 0.05, num_leaves 63, early stopping at 50. Temporal split: Train 2011-06 to 2025-06; Test 2025-07 to 2025-12; no shuffle to respect time order. Why LightGBM: handles nonlinearity, many features, trains fast, and early stopping helps avoid overfitting.
+
+Results: R² near 0.99, RMSE about 3.97, MAE about 0.87—roughly a 4-search-per-month average error. Early stopping stopped at tree 139, giving a stable model without overfitting. This accuracy is strong for short-term forecasting of search demand.
+
+Feature importance: leaders are traffic_yoy_change, traffic_lag_12m, traffic_lag_1m, rolling_mean, year, and dest_mean_traffic. Weather appears in the top group: temp_amplitude, temp_max, rainfall_total. GRDP is present as well. The message: history and seasonality dominate, but weather and economics add valuable signal.
+
+Insights: Year-over-year change and a 12-month lag carry much of the weight—demand is strongly cyclical. A 1-month lag and rolling means catch destinations that are heating up. High temperature amplitude, high max temperature, and heavy rainfall correlate with lower demand. GRDP and population boost destination attractiveness. Use these lenses to prioritize marketing, incentives, and weather-aware product adjustments.
+
+Destination forecasts: top predicted hotspots include Binh An (Can Tho), Phu Quoc (An Giang), Xuan Son (Phu Tho), Dong Thong (Bac Ninh), Ho Tay (Lam Dong), and others. Select two to three fast-rising spots for prioritized marketing budgets and on-the-ground validation.
+
+Fastest growers: Deo Ngang, Xuan Son, Lam Kinh, Ban Buoc, Dong Tu Thuc, and more—many are cultural or heritage sites. Package cultural/heritage products by season and launch early to ride the wave.
+
+Provincial view: leading provinces include Phu Tho, Can Tho, Hanoi, An Giang, Lam Dong, and Ho Chi Minh City. Regional linkages matter: Phu Tho–Hanoi–Bac Ninh in the north; Can Tho–An Giang–Vinh Long in the southwest. Regional tours extend stay length and spending.
+
+Seasonality: three clear peaks—Tet in Jan–Feb, summer in Jul–Aug, and year-end in Dec. Low points are Mar–Apr and Sep–Oct—prime time for promotions and tailored products. Align messaging with expected weather in these windows.
+
+Weather effects: lower temperature amplitude means stable weather and stronger demand. Rainfall under 100mm/month is favorable; above 200mm demand drops sharply. Ideal temperatures around 22–28°C—use this in marketing as “comfortable weather, perfect to travel.”
+
+Recommendations: focus investment and marketing on rising destinations like Xuan Son, Dong Tu Thuc, and Deo Ngang. Stimulate low seasons with bundles in Mar–Apr and Sep–Oct. Optimize by weather: promote indoor products when rain is heavy, outdoor experiences when stable. Grow cultural/heritage tourism and consider VR/AR to enhance experience. Build regional routes: Phu Tho–Hanoi–Bac Ninh and Can Tho–An Giang–Vinh Long.
+
+Limitations: Google Trends reflects online interest, not actual visitors. GRDP is missing some years, so some estimates are needed. No booking or flight data yet; TikTok/Instagram not integrated. These gaps should be closed to raise reliability.
+
+Next steps: integrate booking and flight data; add broader social signals and sentiment analysis; build a real-time forecasting API; assess impacts of special events like festivals or extreme weather.
+
+Conclusion: the model reaches about 0.99 R² with low error—strong for short-term forecasting. Key drivers are history, seasonality, weather, and economics. Promising destinations include Xuan Son, Dong Tu Thuc, and heritage clusters. Short-term strategy should be data-driven, weather-aware, with off-peak stimulation and a focus on fast-growing spots. I welcome feedback to refine the model and its real-world use.
+
+Thank you for listening. I’m happy to take questions. Please leave your email, phone, or GitHub for follow-up.
